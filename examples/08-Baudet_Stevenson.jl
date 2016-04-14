@@ -15,7 +15,7 @@ function main()
   psort!(x, comm)
 
   # Write the result to a file
-  fid = open(@sprintf("psort_%03d.txt", MPI.Comm_rank(comm)), "w")
+  fid = open(@sprintf("output/psort_%03d.txt", MPI.Comm_rank(comm)), "w")
   for k = 1:length(x)
     println(fid, x[k])
   end
