@@ -4,6 +4,8 @@ module MPI
 
 using Compat
 
+using Libdl
+
 @static if is_windows()
     const depfile = "win_mpiconstants.jl"
 end
