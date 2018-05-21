@@ -20,7 +20,7 @@ const _user_functions = Array{Function}(1) # resized to nthreads() at runtime
 const _user_op = Op(MPI_OP_NULL) # _mpi_user_function operation, initialized below
 
 # C callback function corresponding to MPI_User_function
-function _mpi_user_function(_a::Ptr{Void}, _b::Ptr{Void}, _len::Ptr{Cint}, t::Ptr{Cint})
+function _mpi_user_function(_a::Ptr{Nothing}, _b::Ptr{Nothing}, _len::Ptr{Cint}, t::Ptr{Cint})
     len = unsafe_load(_len)
     T = mpitype_dict_inverse[unsafe_load(t)]
     a = Ptr{T}(_a)
@@ -40,9 +40,9 @@ function user_op(opfunc::Function)
         # of some sort so that this initialization only occurs once.
         # To do when native threading in Julia stabilizes (and is documented).
         resize!(_user_functions, nthreads())
-        user_function = cfunction(_mpi_user_function, Void, (Ptr{Void}, Ptr{Void}, Ptr{Cint}, Ptr{Cint}))
+        user_function = cfunction(_mpi_user_function, Nothing, (Ptr{Nothing}, Ptr{Nothing}, Ptr{Cint}, Ptr{Cint}))
         opnum = Ref{Cint}()
-        ccall(MPI_OP_CREATE, Void, (Ptr{Void}, Ref{Cint}, Ref{Cint}, Ptr{Cint}),
+        ccall(MPI_OP_CREATE, Nothing, (Ptr{Nothing}, Ref{Cint}, Ref{Cint}, Ptr{Cint}),
              user_function, false, opnum, &0)
         _user_op.val = opnum[]
     end

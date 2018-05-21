@@ -47,9 +47,9 @@ mutable struct MPIManager <: ClusterManager
 
     # MPI_TRANSPORT_ALL
     comm::MPI.Comm
-    initiate_shutdown::Channel{Void}
-    sending_done::Channel{Void}
-    receiving_done::Channel{Void}
+    initiate_shutdown::Channel{Nothing}
+    sending_done::Channel{Nothing}
+    receiving_done::Channel{Nothing}
 
     function MPIManager(; np::Integer = Sys.CPU_CORES,
                           mpirun_cmd::Cmd = `mpiexec -n $np`,
@@ -98,12 +98,12 @@ mutable struct MPIManager <: ClusterManager
         end
 
         if mode == MPI_TRANSPORT_ALL
-            mgr.initiate_shutdown = Channel{Void}(1)
-            mgr.sending_done = Channel{Void}(np)
-            mgr.receiving_done = Channel{Void}(1)
+            mgr.initiate_shutdown = Channel{Nothing}(1)
+            mgr.sending_done = Channel{Nothing}(np)
+            mgr.receiving_done = Channel{Nothing}(1)
             global initiate_shutdown = mgr.initiate_shutdown
         end
-        mgr.initiate_shutdown = Channel{Void}(1)
+        mgr.initiate_shutdown = Channel{Nothing}(1)
         global initiate_shutdown = mgr.initiate_shutdown
 
         return mgr
