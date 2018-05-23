@@ -970,8 +970,12 @@ end
 # Conversion between C and Fortran Comm handles:
 if HAVE_MPI_COMM_C2F
     # use MPI_Comm_f2c and MPI_Comm_c2f
-    Base.convert(::Type{CComm}, comm::Comm) =
-        ccall((:MPI_Comm_f2c, libmpi), CComm, (Cint,), comm.val)
+    function CComm(comm::Comm)
+      ccall((:MPI_Comm_f2c, libmpi), CComm, (Cint,), comm.val)
+    end
+    function Comm(ccomm::CComm)
+      Comm(ccall((:MPI_Comm_c2f, libmpi), Cint, (CComm,), ccomm))
+    end
     Base.convert(::Type{Comm}, ccomm::CComm) =
         Comm(ccall((:MPI_Comm_c2f, libmpi), Cint, (CComm,), ccomm))
     # Assume info is treated the same way
