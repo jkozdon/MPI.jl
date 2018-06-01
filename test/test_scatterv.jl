@@ -9,7 +9,7 @@ function scatterv_array(A, counts::Vector{Cint}, root)
     if MPI.Comm_rank(comm) == root
         B = copy(A)
     else
-        B = Array{T}(1)
+        B = Array{T}(undef,1)
     end
     C = MPI.Scatterv(B, counts, root, comm)
 end
