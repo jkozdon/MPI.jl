@@ -469,7 +469,7 @@ end
 function Waitall!(reqs::Array{Request,1})
     count = length(reqs)
     reqvals = [reqs[i].val for i in 1:count]
-    statvals = Array{Cint}(MPI_STATUS_SIZE, count)
+    statvals = Array{Cint}(undef, MPI_STATUS_SIZE, count)
     ccall(MPI_WAITALL, Nothing,
           (Ref{Cint}, Ptr{Cint}, Ptr{Cint}, Ref{Cint}),
           count, reqvals, statvals, 0)
@@ -489,7 +489,7 @@ function Testall!(reqs::Array{Request,1})
     count = length(reqs)
     reqvals = [reqs[i].val for i in 1:count]
     flag = Ref{Cint}()
-    statvals = Array{Cint}(MPI_STATUS_SIZE, count)
+    statvals = Array{Cint}(undef, MPI_STATUS_SIZE, count)
     ccall(MPI_TESTALL, Nothing,
           (Ref{Cint}, Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Ref{Cint}),
           count, reqvals, flag, statvals, 0)
@@ -545,7 +545,7 @@ function Waitsome!(reqs::Array{Request,1})
     reqvals = [reqs[i].val for i in 1:count]
     outcnt = Ref{Cint}()
     inds = Array{Cint}(undef, count)
-    statvals = Array{Cint}(MPI_STATUS_SIZE, count)
+    statvals = Array{Cint}(undef,MPI_STATUS_SIZE, count)
     ccall(MPI_WAITSOME, Nothing,
           (Ref{Cint}, Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Ref{Cint}),
           count, reqvals, outcnt, inds, statvals, 0)
@@ -574,7 +574,7 @@ function Testsome!(reqs::Array{Request,1})
     reqvals = [reqs[i].val for i in 1:count]
     outcnt = Ref{Cint}()
     inds = Array{Cint}(undef, count)
-    statvals = Array{Cint}(MPI_STATUS_SIZE, count)
+    statvals = Array{Cint}(undef,MPI_STATUS_SIZE, count)
     ccall(MPI_TESTSOME, Nothing,
           (Ref{Cint}, Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Ref{Cint}),
           count, reqvals, outcnt, inds, statvals, 0)
