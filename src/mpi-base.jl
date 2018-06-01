@@ -955,7 +955,8 @@ function Comm_get_parent()
     return Comm(comm_id[])
 end
 
-function Comm_spawn(command::String, argv::Vector{String}, nprocs::Integer, comm::Comm, errors = Vector{Cint}(nprocs))
+function Comm_spawn(command::String, argv::Vector{String}, nprocs::Integer,
+                    comm::Comm, errors = Vector{Cint}(undef, nprocs))
     c_intercomm = Ref{CComm}()
     ccall((:MPI_Comm_spawn, libmpi), Nothing,
          (Cstring, Ptr{Ptr{Cchar}}, Cint, CInfo, Cint, CComm, Ref{CComm}, Ptr{Cint}),
