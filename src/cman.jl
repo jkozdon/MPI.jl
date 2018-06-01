@@ -1,4 +1,4 @@
-import Base: launch, manage, kill, procs, connect
+import Base: kill, procs, connect
 export MPIManager, launch, manage, kill, procs, connect, mpiprocs, @mpi_do
 export TransportMode, MPI_ON_WORKERS, TCP_TRANSPORT_ALL, MPI_TRANSPORT_ALL
 using Compat.Distributed
@@ -120,7 +120,7 @@ end
 # MPI_ON_WORKERS case
 
 # Launch a new worker, called from Base.addprocs
-function launch(mgr::MPIManager, params::Dict,
+function Distributed.launch(mgr::MPIManager, params::Dict,
                 instances::Array, cond::Condition)
     try
         if mgr.mode == MPI_ON_WORKERS
@@ -207,7 +207,7 @@ function setup_worker(host, port, cookie)
 end
 
 # Manage a worker (e.g. register / deregister it)
-function manage(mgr::MPIManager, id::Integer, config::WorkerConfig, op::Symbol)
+function Distributed.manage(mgr::MPIManager, id::Integer, config::WorkerConfig, op::Symbol)
     if op == :register
         # Retrieve MPI rank from worker
         # TODO: Why is this necessary? The workers already sent their rank.
@@ -494,7 +494,7 @@ macro mpi_do(mgr, expr)
 end
 
 # All managed Julia processes
-procs(mgr::MPIManager) = sort(keys(mgr.j2mpi))
+Distributed.procs(mgr::MPIManager) = sort(keys(mgr.j2mpi))
 
 # All managed MPI ranks
 mpiprocs(mgr::MPIManager) = sort(keys(mgr.mpi2j))
