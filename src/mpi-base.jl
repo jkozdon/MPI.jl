@@ -175,15 +175,16 @@ const ANY_TAG    = Int(MPI_ANY_TAG)
 const TAG_UB     = Int(MPI_TAG_UB)
 const UNDEFINED  = Int(MPI_UNDEFINED)
 
+using Compat.Serialization
 function serialize(x)
     s = IOBuffer()
-    Base.serialize(s, x)
+    Serialization.serialize(s, x)
     take!(s)
 end
 
 function deserialize(x)
     s = IOBuffer(x)
-    Base.deserialize(s)
+    Serialization.deserialize(s)
 end
 
 # Administrative functions

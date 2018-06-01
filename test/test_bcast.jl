@@ -1,4 +1,5 @@
 using Compat.Test
+using Compat.Random
 using MPI
 
 MPI.Init()
