@@ -1,9 +1,9 @@
-using Base.Test
+using Compat.Test
 using MPI
 
 # Start workers via `mpiexec` that communicate among themselves via MPI;
 # communicate with the workers via TCP
-if !is_windows() && contains(readlines(open(`mpiexec --version`)[1])[1], "OpenRTE")
+if !Compat.Sys.iswindows() && contains(readlines(open(`mpiexec --version`)[1])[1], "OpenRTE")
     mgr = MPI.MPIManager(np=4, mpirun_cmd=`mpiexec --oversubscribe -n 4`)
 else
     mgr = MPI.MPIManager(np=4)

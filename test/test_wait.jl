@@ -1,5 +1,5 @@
 # tests for the various kinds of waits
-using Base.Test
+using Compat.Test
 using MPI
 
 MPI.Init()

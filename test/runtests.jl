@@ -1,5 +1,5 @@
 using MPI
-using Base.Test
+using Compat.Test
 
 using Compat
 import Compat.String
@@ -21,7 +21,7 @@ juliafiles = ["test_cman_julia.jl"]
 singlefiles = ["test_spawn.jl"]
 
 excludedfiles = []
-if is_windows()
+if Compat.Sys.iswindows()
     excludedfiles = ["test_info.jl", "test_onesided.jl"]
     if Sys.WORD_SIZE == 32
         push!(excludedfiles, "test_spawn.jl")
@@ -36,7 +36,7 @@ function runtests()
     testfiles = sort(filter(istest, readdir(testdir)))
 
     extra_args = []
-    @static if !is_windows()
+    @static if !Compat.Sys.iswindows()
         if contains(readlines(open(`mpiexec --version`)[1])[1], "OpenRTE")
             push!(extra_args,"--oversubscribe")
         end
