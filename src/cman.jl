@@ -83,7 +83,7 @@ mutable struct MPIManager <: ClusterManager
         if mode != MPI_TRANSPORT_ALL
             # Start a listener for capturing stdout from the workers
             port, server = Compat.Sockets.listenany(11000)
-            @schedule begin
+            @Compat.async begin
                 while true
                     sock = Compat.Sockets.accept(server)
                     push!(mgr.stdout_ios, sock)
@@ -284,7 +284,7 @@ function start_send_event_loop(mgr::MPIManager, rank::Int)
         # quite expensive when there are many workers. Design something better.
         # For example, instead of maintaining two streams per worker, provide
         # only abstract functions to write to / read from these streams.
-        @schedule begin
+        @Compat.async begin
             rr = MPI.Comm_rank(mgr.comm)
             reqs = MPI.Request[]
             while !isready(mgr.initiate_shutdown)
@@ -362,7 +362,7 @@ function start_main_loop(mode::TransportMode=TCP_TRANSPORT_ALL;
             # transport, but need it to satisfy the changed protocol.
             MPI.bcast(Base.cluster_cookie(), 0, comm)
             # Start event loop for the workers
-            @schedule receive_event_loop(mgr)
+            @Compat.async receive_event_loop(mgr)
             # Tell Base about the workers
             addprocs(mgr)
             return mgr
