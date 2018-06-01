@@ -1,16 +1,14 @@
-using Compat
 using Compat.Test
-using Compat.Distributed
 using MPI
 
 # Start workers via `mpiexec` that communicate among themselves via MPI;
 # communicate with the workers via TCP
-if !Compat.Sys.iswindows() && Compat.occursin( "OpenRTE", Compat.open(f->read(f, String),`mpiexec --version`))
+if !Compat.Sys.iswindows() && contains(readlines(open(`mpiexec --version`)[1])[1], "OpenRTE")
     mgr = MPI.MPIManager(np=4, mpirun_cmd=`mpiexec --oversubscribe -n 4`)
 else
     mgr = MPI.MPIManager(np=4)
 end
-Distributed.addprocs(mgr)
+addprocs(mgr)
 
 refs = []
 for w in workers()
