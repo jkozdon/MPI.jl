@@ -10,7 +10,7 @@ if !Compat.Sys.iswindows() && Compat.occursin( "OpenRTE", Compat.open(f->read(f,
 else
     mgr = MPI.MPIManager(np=4)
 end
-addprocs(mgr)
+Distributed.addprocs(mgr)
 
 refs = []
 for w in workers()
