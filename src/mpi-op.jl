@@ -42,8 +42,8 @@ function user_op(opfunc::Function)
         resize!(_user_functions, nthreads())
         user_function = cfunction(_mpi_user_function, Nothing, (Ptr{Nothing}, Ptr{Nothing}, Ptr{Cint}, Ptr{Cint}))
         opnum = Ref{Cint}()
-        ccall(MPI_OP_CREATE, Nothing, (Ptr{Nothing}, Ref{Cint}, Ref{Cint}, Ptr{Cint}),
-             user_function, false, opnum, &0)
+        ccall(MPI_OP_CREATE, Nothing, (Ptr{Nothing}, Ref{Cint}, Ref{Cint}, Ref{Cint}),
+             user_function, false, opnum, 0)
         _user_op.val = opnum[]
     end
 
