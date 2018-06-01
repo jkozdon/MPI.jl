@@ -103,9 +103,10 @@ mutable struct Info
         newinfo = Ref{Cint}()
         ccall(MPI_INFO_CREATE, Nothing, (Ptr{Cint}, Ref{Cint}), newinfo, 0)
         info=new(newinfo[])
-        Compat.finalizer(info -> ( ccall(MPI_INFO_FREE, Nothing,
-                                       (Ref{Cint}, Ref{Cint}), info.val, 0);
-                                  info.val = MPI_INFO_NULL ), info)
+        @compat finalizer(info) do x
+          ccall(MPI_INFO_FREE, Nothing, (Ref{Cint}, Ref{Cint}), x.val, 0)
+          x.val = MPI_INFO_NULL
+        end
         info
     end
 
