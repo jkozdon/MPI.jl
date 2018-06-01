@@ -43,7 +43,7 @@ function runtests()
     end
 
     nfail = 0
-    print_with_color(:white, "Running MPI.jl tests\n")
+    Compat.printstyled("Running MPI.jl tests\n"; color=:white)
     for f in testfiles
         if f ∈ excludedfiles
             println("Skipping disabled test $f")
