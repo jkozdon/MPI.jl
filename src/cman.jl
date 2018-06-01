@@ -148,7 +148,7 @@ function Distributed.launch(mgr::MPIManager, params::Dict,
             end
 
             # Traverse all worker I/O streams and receive their MPI rank
-            configs = Array{WorkerConfig}(mgr.np)
+            configs = Array{WorkerConfig}(undef,mgr.np)
             @sync begin
                 for io in mgr.stdout_ios
                     @async let io=io
@@ -391,7 +391,7 @@ function receive_event_loop(mgr::MPIManager)
         (hasdata, stat) = MPI.Iprobe(MPI.ANY_SOURCE, 0, mgr.comm)
         if hasdata
             count = Get_count(stat, UInt8)
-            buf = Array{UInt8}(count)
+            buf = Array{UInt8}(undef,count)
             from_rank = Get_source(stat)
             MPI.Recv!(buf, from_rank, 0, mgr.comm)
 
@@ -456,7 +456,7 @@ end
 function mpi_do(mgr::MPIManager, expr)
     !mgr.initialized && wait(mgr.cond_initialized)
     jpids = keys(mgr.j2mpi)
-    refs = Array{Any}(length(jpids))
+    refs = Array{Any}(undef,length(jpids))
     for (i,p) in enumerate(Iterators.filter(x -> x != myid(), jpids))
         refs[i] = remotecall(expr, p)
     end
