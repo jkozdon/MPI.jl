@@ -129,7 +129,7 @@ function Distributed.launch(mgr::MPIManager, params::Dict,
                 println("Try again with a different instance of MPIManager.")
                 throw(ErrorException("Reuse of MPIManager is not allowed."))
             end
-            cookie = string(":cookie_",Base.cluster_cookie())
+            cookie = string(":cookie_",Distributed.cluster_cookie())
             setup_cmds = `using MPI\;MPI.setup_worker'('$(getipaddr().host),$(mgr.port),$cookie')'`
             mpi_cmd = `$(mgr.mpirun_cmd) $(params[:exename]) -e $(Base.shell_escape(setup_cmds))`
             open(detach(mpi_cmd))
