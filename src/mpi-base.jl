@@ -20,8 +20,8 @@ function mpitype(::Type{T}) where T
       return mpitype_dict[T]
     end
 
-    if !isbits(T)
-        throw(ArgumentError("Type must be isbits()"))
+    if !Compat.isbitstype(T)
+        throw(ArgumentError("Type must be isbitstype()"))
     end
 
     # get the data from the type
@@ -263,8 +263,8 @@ function Wtime()
 end
 
 function type_create(T::DataType)
-    if !isbits(T)
-        throw(ArgumentError("Type must be isbits()"))
+    if !Compat.isbitstype(T)
+        throw(ArgumentError("Type must be isbitstype()"))
     end
 
     if haskey(mpitype_dict, T)  # if the datatype already exists
