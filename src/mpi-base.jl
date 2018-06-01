@@ -995,12 +995,24 @@ if HAVE_MPI_COMM_C2F
 elseif sizeof(CComm) == sizeof(Cint)
     # in MPICH, both C and Fortran use identical Cint comm handles
     # and MPI_Comm_c2f is not provided.
-    Base.convert(::Type{CComm}, comm::Comm) = reinterpret(CComm, comm.val)
-    Base.convert(::Type{Comm}, ccomm::CComm) = Comm(reinterpret(Cint, ccomm))
-    Base.convert(::Type{CInfo}, info::Info) = reinterpret(CInfo, info.val)
-    Base.convert(::Type{Info}, cinfo::CInfo) = Info(reinterpret(Cint, cinfo))
-    Base.convert(::Type{CWin}, win::Win) = reinterpret(CWin, win.val)
-    Base.convert(::Type{Win}, cwin::CWin) = Win(reinterpret(Cint, cwin))
+    function CComm(comm::Comm)
+      reinterpret(CComm, comm.val)
+    end
+    function Comm(ccomm::CComm)
+      Comm(reinterpret(Cint, ccomm))
+    end
+    function CInfo(info::Info)
+      reinterpret(CInfo, info.val)
+    end
+    function Info(cinfo::CInfo)
+      Info(reinterpret(Cint, cinfo))
+    end
+    function CWin(win::Win)
+      reinterpret(CWin, win.val)
+    end
+    function Win(cwin::CWin)
+      Win(reinterpret(Cint, cwin))
+    end
 else
     warn("No MPI_Comm_c2f found - conversion to/from MPI.CComm will not work")
 end
