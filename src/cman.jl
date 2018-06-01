@@ -82,10 +82,10 @@ mutable struct MPIManager <: ClusterManager
         # Listen to TCP sockets if necessary
         if mode != MPI_TRANSPORT_ALL
             # Start a listener for capturing stdout from the workers
-            port, server = listenany(11000)
+            port, server = Compat.Sockets.listenany(11000)
             @schedule begin
                 while true
-                    sock = accept(server)
+                    sock = Compat.Sockets.accept(server)
                     push!(mgr.stdout_ios, sock)
                 end
             end
@@ -130,7 +130,7 @@ function Distributed.launch(mgr::MPIManager, params::Dict,
                 throw(ErrorException("Reuse of MPIManager is not allowed."))
             end
             cookie = string(":cookie_",Distributed.cluster_cookie())
-            setup_cmds = `using MPI\;MPI.setup_worker'('$(getipaddr().host),$(mgr.port),$cookie')'`
+            setup_cmds = `using MPI\;MPI.setup_worker'('$(Compat.Sockets.getipaddr().host),$(mgr.port),$cookie')'`
             mpi_cmd = `$(mgr.mpirun_cmd) $(params[:exename]) -e $(Base.shell_escape(setup_cmds))`
             open(detach(mpi_cmd))
             mgr.launched = true
@@ -185,7 +185,7 @@ setup_worker(host, port) = setup_worker(host, port, nothing)
 function setup_worker(host, port, cookie)
     !MPI.Initialized() && MPI.Init()
     # Connect to the manager
-    io = Compat.Sockets.connect(IPv4(host), port)
+    io = Compat.Sockets.connect(Compat.Sockets.IPv4(host), port)
     Base.wait_connected(io)
     redirect_stdout(io)
     redirect_stderr(io)
@@ -335,7 +335,7 @@ function start_main_loop(mode::TransportMode=TCP_TRANSPORT_ALL;
             # TODO: Use Bcast
             for j in 1:size-1
                 cookie = VERSION >= v"0.5.0-dev+4047" ? Base.cluster_cookie() : nothing
-                MPI.send((getipaddr().host, mgr.port, cookie), j, 0, comm)
+                MPI.send((Compat.Sockets.getipaddr().host, mgr.port, cookie), j, 0, comm)
             end
             # Tell Base about the workers
             addprocs(mgr)
