@@ -34,7 +34,6 @@ function runtests()
     testdir = dirname(@__FILE__)
     istest(f) = endswith(f, ".jl") && startswith(f, "test_")
     testfiles = sort(filter(istest, readdir(testdir)))
-    testfiles = ()
 
     extra_args = []
     @static if !Compat.Sys.iswindows()
@@ -59,11 +58,11 @@ function runtests()
             else
                 run(`mpiexec $extra_args -n $nprocs $exename --code-coverage=$coverage_opt $(joinpath(testdir, f))`)
             end
-            Base.with_output_color(:green,STDOUT) do io
+            Base.with_output_color(:green,Compat.stdout) do io
                 println(io,"\tSUCCESS: $f")
             end
         catch ex
-            Base.with_output_color(:red,STDERR) do io
+            Base.with_output_color(:red,Compat.stderr) do io
                 println(io,"\tError: $(joinpath(testdir, f))")
                 showerror(io,ex,backtrace())
             end
