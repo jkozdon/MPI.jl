@@ -153,7 +153,7 @@ Info_free(info::Info) = finalize(info)
 
 mutable struct Status
     val::Array{Cint,1}
-    Status() = new(Array{Cint}(MPI_STATUS_SIZE))
+    Status() = new(Array{Cint}(undef, MPI_STATUS_SIZE))
 end
 Get_error(stat::Status) = Int(stat.val[MPI_ERROR])
 Get_source(stat::Status) = Int(stat.val[MPI_SOURCE])
@@ -415,7 +415,7 @@ end
 function recv(src::Integer, tag::Integer, comm::Comm)
     stat = Probe(src, tag, comm)
     count = Get_count(stat, UInt8)
-    buf = Array{UInt8}(count)
+    buf = Array{UInt8}(undef, count)
     stat = Recv!(buf, Get_source(stat), Get_tag(stat), comm)
     (MPI.deserialize(buf), stat)
 end
@@ -441,7 +441,7 @@ function irecv(src::Integer, tag::Integer, comm::Comm)
         return (false, nothing, nothing)
     end
     count = Get_count(stat, UInt8)
-    buf = Array{UInt8}(count)
+    buf = Array{UInt8}(undef, count)
     stat = Recv!(buf, Get_source(stat), Get_tag(stat), comm)
     (true, MPI.deserialize(buf), stat)
 end
@@ -473,7 +473,7 @@ function Waitall!(reqs::Array{Request,1})
     ccall(MPI_WAITALL, Nothing,
           (Ref{Cint}, Ptr{Cint}, Ptr{Cint}, Ref{Cint}),
           count, reqvals, statvals, 0)
-    stats = Array{Status}(count)
+    stats = Array{Status}(undef, count)
     for i in 1:count
         reqs[i].val = reqvals[i]
         reqs[i].buffer = nothing
@@ -496,7 +496,7 @@ function Testall!(reqs::Array{Request,1})
     if flag[] == 0
         return (false, nothing)
     end
-    stats = Array{Status}(count)
+    stats = Array{Status}(undef, count)
     for i in 1:count
         reqs[i].val = reqvals[i]
         reqs[i].buffer = nothing
@@ -544,7 +544,7 @@ function Waitsome!(reqs::Array{Request,1})
     count = length(reqs)
     reqvals = [reqs[i].val for i in 1:count]
     outcnt = Ref{Cint}()
-    inds = Array{Cint}(count)
+    inds = Array{Cint}(undef, count)
     statvals = Array{Cint}(MPI_STATUS_SIZE, count)
     ccall(MPI_WAITSOME, Nothing,
           (Ref{Cint}, Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Ref{Cint}),
@@ -554,8 +554,8 @@ function Waitsome!(reqs::Array{Request,1})
     if outcount == UNDEFINED
         outcount = 0
     end
-    indices = Array{Int}(outcount)
-    stats = Array{Status}(outcount)
+    indices = Array{Int}(undef, outcount)
+    stats = Array{Status}(undef, outcount)
     for i in 1:outcount
         ind = Int(inds[i])
         reqs[ind].val = reqvals[ind]
@@ -573,7 +573,7 @@ function Testsome!(reqs::Array{Request,1})
     count = length(reqs)
     reqvals = [reqs[i].val for i in 1:count]
     outcnt = Ref{Cint}()
-    inds = Array{Cint}(count)
+    inds = Array{Cint}(undef, count)
     statvals = Array{Cint}(MPI_STATUS_SIZE, count)
     ccall(MPI_TESTSOME, Nothing,
           (Ref{Cint}, Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Ref{Cint}),
@@ -583,8 +583,8 @@ function Testsome!(reqs::Array{Request,1})
     if outcount == UNDEFINED
         outcount = 0
     end
-    indices = Array{Int}(outcount)
-    stats = Array{Status}(outcount)
+    indices = Array{Int}(undef, outcount)
+    stats = Array{Status}(undef, outcount)
     for i in 1:outcount
         ind = Int(inds[i])
         reqs[ind].val = reqvals[ind]
@@ -632,14 +632,14 @@ end
 
 function bcast(obj, root::Integer, comm::Comm)
     isroot = Comm_rank(comm) == root
-    count = Array{Cint}(1)
+    count = Array{Cint}(undef, 1)
     if isroot
         buf = MPI.serialize(obj)
         count[1] = length(buf)
     end
     Bcast!(count, root, comm)
     if !isroot
-        buf = Array{UInt8}(count[1])
+        buf = Array{UInt8}(undef, count[1])
     end
     Bcast!(buf, root, comm)
     if !isroot
