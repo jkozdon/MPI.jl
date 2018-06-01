@@ -717,7 +717,7 @@ function Scatterv(sendbuf::MPIBuffertype{T},
                   comm::Comm) where T
     recvbuf = Compat.Array{T}(undef, counts[Comm_rank(comm) + 1])
     recvcnt = counts[Comm_rank(comm) + 1]
-    disps = cumsum(counts) - counts
+    disps = accumulate(+, counts) - counts
     ccall(MPI_SCATTERV, Nothing,
           (Ptr{T}, Ptr{Cint}, Ptr{Cint}, Ref{Cint}, Ptr{T}, Ref{Cint}, Ref{Cint}, Ref{Cint}, Ref{Cint}, Ref{Cint}),
           sendbuf, counts, disps, mpitype(T), recvbuf, recvcnt, mpitype(T), root, comm.val, 0)
@@ -767,7 +767,7 @@ end
 function Gatherv(sendbuf::MPIBuffertype{T}, counts::Vector{Cint},
                  root::Integer, comm::Comm) where T
     isroot = Comm_rank(comm) == root
-    displs = cumsum(counts) - counts
+    displs = accumulate(+, counts) - counts
     sendcnt = counts[Comm_rank(comm) + 1]
     recvbuf = Compat.Array{T}(undef, isroot ? sum(counts) : 0)
     ccall(MPI_GATHERV, Nothing,
@@ -778,7 +778,7 @@ end
 
 function Allgatherv(sendbuf::MPIBuffertype{T}, counts::Vector{Cint},
                     comm::Comm) where T
-    displs = cumsum(counts) - counts
+    displs = accumulate(+, counts) - counts
     sendcnt = counts[Comm_rank(comm) + 1]
     recvbuf = Compat.Array{T}(undef, sum(counts))
     ccall(MPI_ALLGATHERV, Nothing,
@@ -799,8 +799,8 @@ end
 function Alltoallv(sendbuf::MPIBuffertype{T}, scounts::Vector{Cint},
                    rcounts::Vector{Cint}, comm::Comm) where T
     recvbuf = Compat.Array{T}(undef, sum(rcounts))
-    sdispls = cumsum(scounts) - scounts
-    rdispls = cumsum(rcounts) - rcounts
+    sdispls = accumulate(+, scounts) - scounts
+    rdispls = accumulate(+, rcounts) - rcounts
     ccall(MPI_ALLTOALLV, Nothing,
           (Ptr{T}, Ptr{Cint}, Ptr{Cint}, Ref{Cint}, Ptr{T}, Ptr{Cint}, Ptr{Cint}, Ref{Cint}, Ref{Cint}, Ref{Cint}),
           sendbuf, scounts, sdispls, mpitype(T), recvbuf, rcounts, rdispls, mpitype(T), comm.val, 0)
