@@ -979,17 +979,19 @@ if HAVE_MPI_COMM_C2F
     function Comm(ccomm::CComm)
       Comm(ccall((:MPI_Comm_c2f, libmpi), Cint, (CComm,), ccomm))
     end
-    Base.convert(::Type{Comm}, ccomm::CComm) =
-        Comm(ccall((:MPI_Comm_c2f, libmpi), Cint, (CComm,), ccomm))
     # Assume info is treated the same way
-    Base.convert(::Type{CInfo}, info::Info) =
-        ccall((:MPI_Info_f2c, libmpi), CInfo, (Cint,), info.val)
-    Base.convert(::Type{Info}, cinfo::CInfo) =
-        Info(ccall((:MPI_Info_c2f, libmpi), Cint, (CInfo,), cinfo))
-    Base.convert(::Type{CWin}, win::Win) =
-        ccall((:MPI_Win_f2c, libmpi), CWin, (Cint,), win.val)
-    Base.convert(::Type{Win}, cwin::CWin) =
-        Win(ccall((:MPI_Win_c2f, libmpi), Cint, (CWin,), cwin))
+    function CInfo(info::Info)
+      ccall((:MPI_Info_f2c, libmpi), CInfo, (Cint,), info.val)
+    end
+    function Info(cinfo::CInfo)
+      Info(ccall((:MPI_Info_c2f, libmpi), Cint, (CInfo,), cinfo))
+    end
+    function CWin(win::Win)
+      ccall((:MPI_Win_f2c, libmpi), CWin, (Cint,), win.val)
+    end
+    function Win(cwin::CWin)
+      Win(ccall((:MPI_Win_c2f, libmpi), Cint, (CWin,), cwin))
+    end
 elseif sizeof(CComm) == sizeof(Cint)
     # in MPICH, both C and Fortran use identical Cint comm handles
     # and MPI_Comm_c2f is not provided.
