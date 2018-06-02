@@ -1,6 +1,7 @@
 using Compat
 using Compat.Test
 using MPI
+using Compat.Distributed
 
 # Start workers via `mpiexec` that communicate among themselves via MPI;
 # communicate with the workers via TCP
