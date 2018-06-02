@@ -132,7 +132,7 @@ function Distributed.launch(mgr::MPIManager, params::Dict,
                 println("Try again with a different instance of MPIManager.")
                 throw(ErrorException("Reuse of MPIManager is not allowed."))
             end
-            cookie = string(":cookie_",Base.cluster_cookie())
+            cookie = string(":cookie_",Distributed.cluster_cookie())
             setup_cmds = `using MPI\;MPI.setup_worker'('$(getipaddr().host),$(mgr.port),$cookie')'`
             mpi_cmd = `$(mgr.mpirun_cmd) $(params[:exename]) -e $(Base.shell_escape(setup_cmds))`
             open(detach(mpi_cmd))
@@ -337,7 +337,7 @@ function start_main_loop(mode::TransportMode=TCP_TRANSPORT_ALL;
             # Send connection information to all workers
             # TODO: Use Bcast
             for j in 1:size-1
-                cookie = VERSION >= v"0.5.0-dev+4047" ? Base.cluster_cookie() : nothing
+                cookie = VERSION >= v"0.5.0-dev+4047" ? Distributed.cluster_cookie() : nothing
                 MPI.send((getipaddr().host, mgr.port, cookie), j, 0, comm)
             end
             # Tell Base about the workers
@@ -363,7 +363,7 @@ function start_main_loop(mode::TransportMode=TCP_TRANSPORT_ALL;
 
             # Send the cookie over. Introduced in v"0.5.0-dev+4047". Irrelevant under MPI
             # transport, but need it to satisfy the changed protocol.
-            MPI.bcast(Base.cluster_cookie(), 0, comm)
+            MPI.bcast(Distributed.cluster_cookie(), 0, comm)
             # Start event loop for the workers
             @async receive_event_loop(mgr)
             # Tell Base about the workers
