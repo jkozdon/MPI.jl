@@ -1,7 +1,9 @@
-import Base: kill, procs, connect
+import Base: kill
 export MPIManager, launch, manage, kill, procs, connect, mpiprocs, @mpi_do
 export TransportMode, MPI_ON_WORKERS, TCP_TRANSPORT_ALL, MPI_TRANSPORT_ALL
+using Compat
 using Compat.Distributed
+import Compat.Sockets: connect
 
 
 
