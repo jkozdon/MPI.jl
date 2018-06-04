@@ -22,18 +22,17 @@ singlefiles = ["test_spawn.jl"]
 
 excludedfiles = []
 if Compat.Sys.iswindows()
-    excludedfiles = ["test_info.jl", "test_onesided.jl"]
+    push!(excludedfiles, "test_info.jl")
+    push!(excludedfiles, "test_onesided.jl")
     if Sys.WORD_SIZE == 32
         push!(excludedfiles, "test_spawn.jl")
     end
 end
 
 if VERSION > v"0.7.0-DEV.2005"
-  excludedfiles = [
-                   "test_cman_julia.jl",
-                   "test_cman_mpi.jl",
-                   "test_cman_tcp.jl",
-                  ]
+  push!(excludedfiles, "test_cman_julia.jl")
+  push!(excludedfiles, "test_cman_mpi.jl")
+  push!(excludedfiles, "test_cman_tcp.jl")
 end
 function runtests()
     nprocs = clamp(Sys.CPU_CORES, 2, 4)
